@@ -3,6 +3,7 @@
 ## check performance of ipaddress module vs socket module for host scanning a network
 ## naming conventions???? clean up code????
 ## in time clean up by adding more functionality to existing functions, using real exception handling
+## scanning is super slow.. need to make it faster, so much faster
 
 import socket
 import sys
@@ -59,21 +60,23 @@ def hostScan(host):
 		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		# if connection returned value confirms port is open --> store IP address somewhere for later use
 		# else continue to next node
+		print('Scanning {}...'.format(host))
+		
 		portState = sock.connect_ex((host, 21))
-		print("Scanning {}.format(host)...")
+
 		sock.close()
 
 	except KeyboardInterrupt:
-    	print "You pressed Ctrl+C"
-    	sys.exit()
+		print("You pressed Ctrl+C")
+		sys.exit()
 
 	except socket.gaierror:
-    	print 'Hostname could not be resolved. Exiting'
-    	sys.exit()
+		print('Hostname could not be resolved. Exiting')
+		sys.exit()
 
 	except socket.error:
-    	print "Couldn't connect to server"
-    	sys.exit()
+		print("Couldn't connect to server")
+		sys.exit()
 
 
 if __name__ == "__main__":
