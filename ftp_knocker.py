@@ -6,12 +6,16 @@
 ## scanning is super slow.. need to make it faster, so much faster
 
 import socket
+import threading
 import sys
 import subprocess
 import platform
 import ipaddress
+from targetDB import Database
+from models.targetList import Post
 from ftplib import FTP
 
+__author__ = 'pr0c'
 
 def main():
 	if platform.system() == 'Windows':
@@ -26,9 +30,9 @@ def main():
 	ipAddress = usersTarget.split('/')
 
 	if len(ipAddress) > 2:
-		print("\nToo much info; What the hell did you type?\ntry something like 192.168.1.1/24 || a.k.a [IP address][backslash][subnet mask]")
+		print("\nToo much info; What the hell did you type?\ntry something like 192.168.1.0/24 || a.k.a [IP address][backslash][subnet mask]")
 	elif len(ipAddress) < 2:
-		print("\nNot enough info; What the hell did you type?\ntry something like 192.168.1.1/24 || a.k.a [IP address][backslash][subnet mask]")
+		print("\nNot enough info; What the hell did you type?\ntry something like 192.168.1.0/24 || a.k.a [IP address][backslash][subnet mask]")
 	else:
 		if valid_ip(ipAddress[0]) == True:
 			print("\nSeems to be a valid IP... let's have crack at it, eh?!\n\n")
@@ -54,15 +58,48 @@ def networkScan(ipRange):
 	for node in targetNet.hosts():
 		hostScan(str(node))
 
+##
+## need to find what os and command accordingly
+def get_hdwInfo(ip):
+"""		# ping ip
+	p = subprocess.Popen(['ping', ip, '-c1'], stdout=subprocess.PIPE,
+	        stderr=subprocess.PIPE)
+ 
+	out, err = p.communicate()
+ 
+	# arp list
+	p = subprocess.Popen(['arp', '-n'], stdout=subprocess.PIPE,
+	        stderr=subprocess.PIPE)
+ 
+	out, err = p.communicate()
+ 
+	try:
+		arp = [x for x in out.split('\n') if ip in x][0]
+	except IndexError:
+	    sys.exit(1)     # no arp entry found
+	else:
+	    # get the mac address from arp list
+	    # bug: when the IP does not exists on the local network
+	    # this will print out the interface name
+	    return ' '.join(arp.split()).split()[2]
+"""
+
 
 def hostScan(host):
 	try:	
-		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		sock = socket.socket(2,1) # socket.AF_INET, socket.SOCK_STREAM
+		sock.settimeout(0.5)
 		# if connection returned value confirms port is open --> store IP address somewhere for later use
 		# else continue to next node
 		print('Scanning {}...'.format(host))
 		
 		portState = sock.connect_ex((host, 21))
+
+		if portState == 0:
+			print("\n{} has port 21 open!\n".format(host))
+			print("Grabbing MAC address and hostname...")
+
+			get_hdwInfo(host)
 
 		sock.close()
 
