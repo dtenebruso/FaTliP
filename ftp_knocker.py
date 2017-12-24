@@ -17,10 +17,14 @@ from ftplib import FTP
 
 __author__ = 'pr0c'
 
+usersPlatform = platform.system()
+
 def main():
-	if platform.system() == 'Windows':
+	global usersPlatform
+
+	if usersPlatform == 'Windows':
 		subprocess.call('cls', shell=True)
-	elif platform.system() == 'Linux':
+	elif usersPlatform == 'Linux':
 		subprocess.call('clear', shell=True)
 	else:
 		pass
@@ -35,12 +39,12 @@ def main():
 		print("\nNot enough info; What the hell did you type?\ntry something like 192.168.1.0/24 || a.k.a [IP address][backslash][subnet mask]")
 	else:
 		if valid_ip(ipAddress[0]) == True:
-			print("\nSeems to be a valid IP... let's have crack at it, eh?!\n\n")
+			print("\nSeems to be a valid IP... let's have a crack at it, eh?!\n\n")
 			print("-"*120)
-			print("  Please hold onto your panties because we are doing a scannies... shutup i was drunk while coding this,**buuerrerrrp*")
+			print("  Please hold onto your panties because we are doing a scannies... shhhhhhh *buuerrerrrp*")
 			print("-"*120)
 
-			networkScan('/'.join(ipAddress))
+			network_scan('/'.join(ipAddress))
 		else:
 			sys.exit()
 
@@ -53,39 +57,62 @@ def valid_ip(testADDR):
    		print('\n{} is not a valid IP address.\n\n*\\.*\\.*\\.*\\.Exiting./*./*./*./*'.format(testADDR))
    		return False
 
-def networkScan(ipRange):
-	targetNet = ipaddress.ip_network(ipRange)
+def network_scan(ipRange):
+	targetNet = ipaddress.ip_network(ipRange, strict=False)
 	for node in targetNet.hosts():
-		hostScan(str(node))
+		host_scan(str(node))
 
-##
-## need to find what os and command accordingly
+######################################################################
 def get_hdwInfo(ip):
-"""		# ping ip
-	p = subprocess.Popen(['ping', ip, '-c1'], stdout=subprocess.PIPE,
-	        stderr=subprocess.PIPE)
+	global usersPlatform
+	if usersPlatform == "Linux":
+		# ping the target host to get entry in arp table
+		probe = subprocess.Popen(['ping', ip, '-c1'], stdout=subprocess.PIPE,
+		        stderr=subprocess.PIPE)
  
-	out, err = p.communicate()
+		out, err = probe.communicate()
  
-	# arp list
-	p = subprocess.Popen(['arp', '-n'], stdout=subprocess.PIPE,
-	        stderr=subprocess.PIPE)
+		# arp list
+		probe = subprocess.Popen(['arp', '-n'], stdout=subprocess.PIPE,
+		        stderr=subprocess.PIPE)
  
-	out, err = p.communicate()
+		out, err = probe.communicate()
  
-	try:
-		arp = [x for x in out.split('\n') if ip in x][0]
-	except IndexError:
-	    sys.exit(1)     # no arp entry found
-	else:
-	    # get the mac address from arp list
-	    # bug: when the IP does not exists on the local network
-	    # this will print out the interface name
-	    return ' '.join(arp.split()).split()[2]
-"""
+		try:
+			arp = [x for x in out.split('\n') if ip in x][0]
+		except IndexError:
+		    sys.exit(1)     # no arp entry found
+		else:
+		    # get the mac address from arp list
+		    # bug: when the IP does not exists on the local network
+		    # this will print out the interface name
+		    return ' '.join(arp.split()).split()[2]
 
+	elif usersPlatform == "Windows":
+		# ping the target host to get entry in arp table
+		probe = subprocess.Popen(['ping', ip, '-n 1'], stdout=subprocess.PIPE,
+		        stderr=subprocess.PIPE)
+ 
+		out, err = probe.communicate()
+ 
+		# arp list
+		probe = subprocess.Popen(['arp', '-a'], stdout=subprocess.PIPE,
+		        stderr=subprocess.PIPE)
+ 
+		out, err = probe.communicate()
+ 
+		try:
+			arp = [x for x in out.split('\n') if ip in x][0]
+		except IndexError:
+		    sys.exit(1)     # no arp entry found
+		else:
+		    # get the mac address from arp list
+		    # bug: when the IP does not exists on the local network
+		    # this will print out the interface name
+		    return ' '.join(arp.split()).split()[2]
+######################################################################
 
-def hostScan(host):
+def host_scan(host):
 	try:	
 		sock = socket.socket(2,1) # socket.AF_INET, socket.SOCK_STREAM
 		sock.settimeout(0.5)
