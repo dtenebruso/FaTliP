@@ -120,9 +120,9 @@ def get_hdwInfo(ip):
 
 def nmap_hdwInfo(ip):
 	scanner = nmap.PortScanner()
-	scanResults = scanner(arguments='-Sn -p 21', hosts=ip)
+	scanResults = scanner.scan(arguments='-sS -p 21', hosts=ip)
 	macAddr = scanResults['scan'][ip]['addresses']['mac']
-	#hostname = scanResults[ip].hostname()
+	hostname = scanResults['scan'][ip]['hostnames'][0]['name']
 	return macAddr, hostname
 
 ######################################################################
@@ -140,9 +140,9 @@ def host_scan(host):
 		if portState == 0:
 			print("\n{} has port 21 open!\n".format(host))
 			print("Grabbing MAC address and hostname...")
-
-			# get_hdwInfo(host)
-			# nmap_hdwInfo
+			macAddress, hostname = nmap_hdwInfo(host)
+		else:
+			pass
 
 		sock.close()
 
