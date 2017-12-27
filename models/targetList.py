@@ -10,7 +10,7 @@ class Post(object):
         self.hostname = hostname
 
 
-        # post = Post(ip_addr="123", title="a title", hostname = "some hostname", mac_addr = "FF:FF:FF:FF:FF:FF")
+        # post = Post(ip_addr="123", hostname = "some hostname", mac_addr = "FF:FF:FF:FF:FF:FF")
 
 
     def save_to_mongo(self):

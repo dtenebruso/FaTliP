@@ -1,19 +1,20 @@
 ## THINGS to do::::! -- must get sleep
-## add a subnet validator == valid_ip method
+## add a subnet validator == valid_ip method ... test for built-in function with pre-existing solution
 ## check performance of ipaddress module vs socket module for host scanning a network
 ## naming conventions???? clean up code????
 ## in time clean up by adding more functionality to existing functions, using real exception handling
-## scanning is super slow.. need to make it faster, so much faster
+## fix database name vs. collection name
 
-import socket
-import threading
 import sys
-import subprocess
+import nmap
+import socket
 import platform
+import threading
 import ipaddress
+import subprocess
+from ftplib import FTP
 from targetDB import Database
 from models.targetList import Post
-from ftplib import FTP
 
 __author__ = 'pr0c'
 
@@ -41,7 +42,7 @@ def main():
 		if valid_ip(ipAddress[0]) == True:
 			print("\nSeems to be a valid IP... let's have a crack at it, eh?!\n\n")
 			print("-"*120)
-			print("  Please hold onto your panties because we are doing a scannies... shhhhhhh *buuerrerrrp*")
+			print("\t\t\tPlease hold onto your panties because we are doing a scannies")
 			print("-"*120)
 
 			network_scan('/'.join(ipAddress))
@@ -61,8 +62,10 @@ def network_scan(ipRange):
 	targetNet = ipaddress.ip_network(ipRange, strict=False)
 	for node in targetNet.hosts():
 		host_scan(str(node))
-
+"""
 ######################################################################
+##
+# perhaps python-nmap would be of greater benefit here
 def get_hdwInfo(ip):
 	global usersPlatform
 	if usersPlatform == "Linux":
@@ -110,6 +113,18 @@ def get_hdwInfo(ip):
 		    # bug: when the IP does not exists on the local network
 		    # this will print out the interface name
 		    return ' '.join(arp.split()).split()[2]
+"""
+######################################################################
+# NMAP 	NMAP 	NMAP 	NMAP 	NMAP 	NMAP 	NMAP 	NMAP 	NMAP #
+######################################################################
+
+def nmap_hdwInfo(ip):
+	scanner = nmap.PortScanner()
+	scanResults = scanner(arguments='-Sn -p 21', hosts=ip)
+	macAddr = scanResults['scan'][ip]['addresses']['mac']
+	#hostname = scanResults[ip].hostname()
+	return macAddr, hostname
+
 ######################################################################
 
 def host_scan(host):
@@ -126,7 +141,8 @@ def host_scan(host):
 			print("\n{} has port 21 open!\n".format(host))
 			print("Grabbing MAC address and hostname...")
 
-			get_hdwInfo(host)
+			# get_hdwInfo(host)
+			# nmap_hdwInfo
 
 		sock.close()
 
@@ -135,7 +151,7 @@ def host_scan(host):
 		sys.exit()
 
 	except socket.gaierror:
-		print('Hostname could not be resolved. Exiting')
+		print('{} could not be resolved. Exiting'.format(host))
 		sys.exit()
 
 	except socket.error:
