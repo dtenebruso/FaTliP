@@ -1,16 +1,29 @@
-"""
+from targetDB import Database
 
-postData(self, ip_addr, mac_addr, hostname):
-	#place info into json format
-	#push json "packet" to mongo db
+class postData(object):
+	def __init__(self, ip_addr, mac_addr, hostname):
+		self.ip_addr = ip_addr
+		self.mac_addr = mac_addr
+		self.hostname = hostname
 
 
-pullData(self, ip_addr):
+	def postTargets(self):
+		json = {
+            'ip_addr': self.ip_addr,
+            'mac_addr': self.mac_addr,
+            'hostname': self.hostname,}
+
+        Database.insert(collection='targetHosts',
+                        data=json)
+
+
+
+
+	pullData(self):
 	#use ip_addr to pull all relevant info from the database to use with hack attacks
 
-printData():
+	printData():
 	#take everything from databse and place it into json format and output to file
-	
 
 
-"""
+
