@@ -18,11 +18,13 @@ class DataManage(object):
 
 
 
-	#pullData(self):
-	#use ip_addr to pull all relevant info from the database to use with hack attacks
+	def pullData(self):
+		pass
+		#use ip_addr to pull all relevant info from the database to use with hack attacks
 
-	#printData():
-	#take everything from databse and place it into json format and output to file
+	def printData(self):
+		#take everything from databse and place it into json format and output to file
+		Database.print(collection='targetHosts', query=self.ip_addr)
 
 
 

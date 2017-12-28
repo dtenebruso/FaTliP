@@ -9,14 +9,14 @@ class Database(object):
     @staticmethod
     def initialize():
         client = pymongo.MongoClient(Database.URI)
-        Database.DATABASE = client['tagets']
+        Database.DATABASE = client['targets']
 
     @staticmethod
     def insert(collection, data):
         Database.DATABASE[collection].insert(data)
 
     @staticmethod
-    def find(collection, query):
+    def print(collection, query):
         return Database.DATABASE[collection].find(query)
 
     @staticmethod
