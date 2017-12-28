@@ -14,7 +14,7 @@ import ipaddress
 import subprocess
 from ftplib import FTP
 from targetDB import Database
-from models.targetList import Post
+from models.storageCom import DataManage
 
 __author__ = 'pr0c'
 
@@ -123,7 +123,8 @@ def nmap_hdwInfo(ip):
 	scanResults = scanner.scan(arguments='-sS -p 21', hosts=ip)
 	macAddr = scanResults['scan'][ip]['addresses']['mac']
 	hostname = scanResults['scan'][ip]['hostnames'][0]['name']
-	return macAddr, hostname
+	pushToDB = DataManage(ip, macAddr, hostname)
+	pushToDB.postTargets()
 
 ######################################################################
 
@@ -140,7 +141,7 @@ def host_scan(host):
 		if portState == 0:
 			print("\n{} has port 21 open!\n".format(host))
 			print("Grabbing MAC address and hostname...")
-			macAddress, hostname = nmap_hdwInfo(host)
+			nmap_hdwInfo(host)
 		else:
 			pass
 
@@ -160,4 +161,7 @@ def host_scan(host):
 
 
 if __name__ == "__main__":
+
+	Database.initialize()
+	
 	main()

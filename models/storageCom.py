@@ -1,6 +1,6 @@
 from targetDB import Database
 
-class postData(object):
+class DataManage(object):
 	def __init__(self, ip_addr, mac_addr, hostname):
 		self.ip_addr = ip_addr
 		self.mac_addr = mac_addr
@@ -13,16 +13,15 @@ class postData(object):
             'mac_addr': self.mac_addr,
             'hostname': self.hostname,}
 
-        Database.insert(collection='targetHosts',
-                        data=json)
+		Database.insert(collection='targetHosts', data=json)
 
 
 
 
-	pullData(self):
+	#pullData(self):
 	#use ip_addr to pull all relevant info from the database to use with hack attacks
 
-	printData():
+	#printData():
 	#take everything from databse and place it into json format and output to file
 
 
